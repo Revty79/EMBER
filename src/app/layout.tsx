@@ -17,6 +17,13 @@ const breeSerif = Bree_Serif({
 export const metadata: Metadata = {
   title: "EMBER",
   description: "Enhanced Memory Backbone for Everyday Reasoning",
+  manifest: "/manifest.webmanifest",
+  themeColor: "#15110f",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "EMBER",
+  },
 };
 
 export default function RootLayout({
