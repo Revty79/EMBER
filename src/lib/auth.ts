@@ -9,7 +9,7 @@ import { createId } from "@/lib/ids";
 import { verifyPassword } from "@/lib/passwords";
 import { requireEnv } from "@/lib/env";
 
-const SESSION_COOKIE_NAME = "ember_session";
+export const SESSION_COOKIE_NAME = "ember_session";
 const SESSION_DURATION_MS = 1000 * 60 * 60 * 24 * 30;
 
 export type AuthenticatedUser = {
@@ -22,6 +22,10 @@ export type AuthenticatedUser = {
 
 function isProduction() {
   return process.env.NODE_ENV === "production";
+}
+
+function authLog(event: string, details: Record<string, unknown>) {
+  console.info(`[auth] ${event}`, details);
 }
 
 function hashSessionToken(token: string) {
@@ -58,13 +62,24 @@ export async function findUserByUsername(username: string) {
 }
 
 export async function validateCredentials(username: string, password: string) {
-  const user = await findUserByUsername(username);
+  const normalizedUsername = normalizeUsername(username);
+  const user = await findUserByUsername(normalizedUsername);
+
+  authLog("username_lookup", {
+    username: normalizedUsername,
+    found: Boolean(user),
+  });
 
   if (!user) {
     return null;
   }
 
   const isValidPassword = await verifyPassword(password, user.passwordHash);
+
+  authLog("password_compare", {
+    username: normalizedUsername,
+    passed: isValidPassword,
+  });
 
   if (!isValidPassword) {
     return null;
@@ -91,36 +106,73 @@ export async function createSession(userId: string) {
   const token = randomBytes(32).toString("hex");
   const tokenHash = hashSessionToken(token);
   const expiresAt = new Date(Date.now() + SESSION_DURATION_MS);
+  const sessionId = createId();
 
   await db.insert(sessions).values({
-    id: createId(),
+    id: sessionId,
     userId,
     tokenHash,
     expiresAt,
   });
 
+  authLog("session_created", {
+    userId,
+    sessionId,
+    expiresAt: expiresAt.toISOString(),
+  });
+
   return { token, expiresAt };
 }
 
-export function attachSessionCookie(response: NextResponse, token: string, expiresAt: Date) {
+function shouldUseSecureCookies(request?: Request) {
+  if (process.env.SESSION_COOKIE_SECURE === "true") {
+    return true;
+  }
+
+  if (process.env.SESSION_COOKIE_SECURE === "false") {
+    return false;
+  }
+
+  if (!request) {
+    return isProduction();
+  }
+
+  const forwardedProto = request.headers.get("x-forwarded-proto")?.split(",")[0]?.trim();
+  if (forwardedProto) {
+    return forwardedProto.toLowerCase() === "https";
+  }
+
+  try {
+    return new URL(request.url).protocol === "https:";
+  } catch {
+    return isProduction();
+  }
+}
+
+export function attachSessionCookie(
+  response: NextResponse,
+  token: string,
+  expiresAt: Date,
+  request?: Request,
+) {
   response.cookies.set({
     name: SESSION_COOKIE_NAME,
     value: token,
     httpOnly: true,
     sameSite: "lax",
-    secure: isProduction(),
+    secure: shouldUseSecureCookies(request),
     path: "/",
     expires: expiresAt,
   });
 }
 
-export function clearSessionCookie(response: NextResponse) {
+export function clearSessionCookie(response: NextResponse, request?: Request) {
   response.cookies.set({
     name: SESSION_COOKIE_NAME,
     value: "",
     httpOnly: true,
     sameSite: "lax",
-    secure: isProduction(),
+    secure: shouldUseSecureCookies(request),
     path: "/",
     expires: new Date(0),
   });

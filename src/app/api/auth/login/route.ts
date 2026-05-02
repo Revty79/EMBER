@@ -24,22 +24,31 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Username and password are required." }, { status: 400 });
   }
 
-  const user = await validateCredentials(username, password);
+  try {
+    const user = await validateCredentials(username, password);
 
-  if (!user) {
-    return NextResponse.json({ error: "Invalid username or password." }, { status: 401 });
+    if (!user) {
+      return NextResponse.json({ error: "Invalid username or password." }, { status: 401 });
+    }
+
+    const session = await createSession(user.id);
+    const response = NextResponse.json({
+      user: {
+        id: user.id,
+        username: user.username,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    });
+
+    attachSessionCookie(response, session.token, session.expiresAt, request);
+    return response;
+  } catch (error) {
+    console.error("[auth] login_failed", {
+      username,
+      message: error instanceof Error ? error.message : "Unknown login error",
+    });
+    return NextResponse.json({ error: "Unable to sign in right now. Please try again." }, { status: 500 });
   }
-
-  const session = await createSession(user.id);
-  const response = NextResponse.json({
-    user: {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-    },
-  });
-
-  attachSessionCookie(response, session.token, session.expiresAt);
-  return response;
 }

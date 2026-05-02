@@ -107,6 +107,6 @@ export async function POST(request: Request) {
     { status: 201 },
   );
 
-  attachSessionCookie(response, session.token, session.expiresAt);
+  attachSessionCookie(response, session.token, session.expiresAt, request);
   return response;
 }
