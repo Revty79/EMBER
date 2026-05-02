@@ -103,3 +103,15 @@ export async function createConversationForUser(userId: string, model: EmberMode
     updatedAt: now.toISOString(),
   } satisfies ConversationSummary;
 }
+
+export async function deleteConversationForUser(conversationId: string, userId: string) {
+  const db = getDb();
+  const [deletedConversation] = await db
+    .delete(conversations)
+    .where(and(eq(conversations.id, conversationId), eq(conversations.userId, userId)))
+    .returning({
+      id: conversations.id,
+    });
+
+  return deletedConversation ?? null;
+}

@@ -37,6 +37,12 @@ type CreateConversationResponse = {
   error?: string;
 };
 
+type DeleteConversationResponse = {
+  success?: boolean;
+  conversationId?: string;
+  error?: string;
+};
+
 type CreateUserResponse = {
   user?: {
     username: string;
@@ -77,6 +83,7 @@ export default function EmberChat({
   const [isSending, setIsSending] = useState(false);
   const [isLoadingConversation, setIsLoadingConversation] = useState(false);
   const [isCreatingConversation, setIsCreatingConversation] = useState(false);
+  const [deletingConversationId, setDeletingConversationId] = useState<string | null>(null);
   const [isCreatingUser, setIsCreatingUser] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [error, setError] = useState("");
@@ -177,6 +184,59 @@ export default function EmberChat({
       );
     } finally {
       setIsCreatingConversation(false);
+    }
+  };
+
+  const handleDeleteConversation = async (conversationId: string) => {
+    if (deletingConversationId || isSending || isLoadingConversation) {
+      return;
+    }
+
+    const targetConversation = conversations.find((conversation) => conversation.id === conversationId);
+    const targetTitle = targetConversation?.title ?? "this conversation";
+    const confirmed = window.confirm(`Delete "${targetTitle}"? This cannot be undone.`);
+
+    if (!confirmed) {
+      return;
+    }
+
+    setDeletingConversationId(conversationId);
+    setError("");
+
+    try {
+      const response = await fetch(`/api/conversations/${conversationId}`, {
+        method: "DELETE",
+      });
+
+      const data = (await response.json().catch(() => null)) as DeleteConversationResponse | null;
+
+      if (!response.ok || !data?.success) {
+        throw new Error(data?.error ?? "Could not delete conversation.");
+      }
+
+      const remainingConversations = conversations.filter(
+        (conversation) => conversation.id !== conversationId,
+      );
+      const nextActiveConversationId =
+        activeConversationId === conversationId ? (remainingConversations[0]?.id ?? null) : activeConversationId;
+
+      setConversations(remainingConversations);
+      setActiveConversationId(nextActiveConversationId);
+      setMessagesByConversation((current) => {
+        const nextMessages = { ...current };
+        delete nextMessages[conversationId];
+        return nextMessages;
+      });
+
+      if (nextActiveConversationId && nextActiveConversationId !== activeConversationId) {
+        await loadConversationMessages(nextActiveConversationId);
+      }
+    } catch (requestError) {
+      setError(
+        requestError instanceof Error ? requestError.message : "Could not delete conversation.",
+      );
+    } finally {
+      setDeletingConversationId(null);
     }
   };
 
@@ -334,17 +394,28 @@ export default function EmberChat({
               <p className={styles.emptyList}>No conversations yet.</p>
             ) : (
               conversations.map((conversation) => (
-                <button
-                  key={conversation.id}
-                  type="button"
-                  className={`${styles.conversationButton} ${
-                    activeConversationId === conversation.id ? styles.conversationButtonActive : ""
-                  }`}
-                  onClick={() => void handleSelectConversation(conversation.id)}
-                >
-                  <span className={styles.conversationTitle}>{conversation.title}</span>
-                  <span className={styles.conversationMeta}>{conversation.model}</span>
-                </button>
+                <div key={conversation.id} className={styles.conversationRow}>
+                  <button
+                    type="button"
+                    className={`${styles.conversationButton} ${
+                      activeConversationId === conversation.id ? styles.conversationButtonActive : ""
+                    }`}
+                    onClick={() => void handleSelectConversation(conversation.id)}
+                  >
+                    <span className={styles.conversationTitle}>{conversation.title}</span>
+                    <span className={styles.conversationMeta}>{conversation.model}</span>
+                  </button>
+                  <button
+                    type="button"
+                    className={styles.deleteConversationButton}
+                    disabled={Boolean(deletingConversationId) || isSending || isLoadingConversation}
+                    onClick={() => void handleDeleteConversation(conversation.id)}
+                    aria-label={`Delete conversation: ${conversation.title}`}
+                    title={`Delete "${conversation.title}"`}
+                  >
+                    {deletingConversationId === conversation.id ? "..." : "Delete"}
+                  </button>
+                </div>
               ))
             )}
           </div>

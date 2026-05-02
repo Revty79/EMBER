@@ -93,6 +93,13 @@
   padding: 1rem 0.5rem;
 }
 
+.conversationRow {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.35rem;
+  align-items: stretch;
+}
+
 .conversationButton {
   border: 1px solid transparent;
   border-radius: 10px;
@@ -122,6 +129,28 @@
 .conversationMeta {
   color: var(--ink-soft);
   font-size: 0.8rem;
+}
+
+.deleteConversationButton {
+  border: 1px solid #e9c9b0;
+  border-radius: 10px;
+  background: #fff4ea;
+  color: #8d4524;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.4rem 0.55rem;
+  cursor: pointer;
+}
+
+.deleteConversationButton:hover:not(:disabled) {
+  border-color: #cf8f68;
+  background: #ffe9d8;
+}
+
+.deleteConversationButton:disabled {
+  opacity: 0.62;
+  cursor: not-allowed;
 }
 
 .adminCard {
