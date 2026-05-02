@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useMemo, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import styles from "./ember-chat.module.css";
 import type { ConversationMessage, ConversationSummary } from "@/lib/chat-types";
@@ -404,6 +405,9 @@ export default function EmberChat({
               {!accountError && accountNotice ? (
                 <p className={styles.accountNotice}>{accountNotice}</p>
               ) : null}
+              <Link className={styles.adminLink} href="/admin/ember-instructions">
+                Edit EMBER Instructions
+              </Link>
             </section>
           ) : null}
 

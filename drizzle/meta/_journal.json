@@ -15,6 +15,13 @@
       "when": 1777683385430,
       "tag": "0001_windy_living_tribunal",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1777692943172,
+      "tag": "0002_bizarre_power_pack",
+      "breakpoints": true
     }
   ]
 }

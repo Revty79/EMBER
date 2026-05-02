@@ -4,6 +4,7 @@ import { getDb } from "@/db/client";
 import { conversations, messages } from "@/db/schema";
 import { getCurrentUser } from "@/lib/auth";
 import { buildConversationTitle } from "@/lib/conversations";
+import { buildEmberIdentityInstruction, getEmberIdentityProfile } from "@/lib/ember-profile";
 import { createId } from "@/lib/ids";
 import {
   buildSystemInstruction,
@@ -45,7 +46,11 @@ export async function POST(request: Request) {
 
   const model = resolveRequestedModel(body.model);
   const responseMode = resolveRequestedResponseMode(body.responseMode);
-  const systemInstruction = buildSystemInstruction(responseMode);
+  const emberIdentityProfile = await getEmberIdentityProfile();
+  const systemInstruction = buildSystemInstruction(
+    responseMode,
+    buildEmberIdentityInstruction(emberIdentityProfile),
+  );
   const runtimeOptions = resolveRuntimeOptions(responseMode);
   const db = getDb();
   const now = new Date();

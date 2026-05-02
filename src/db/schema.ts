@@ -83,9 +83,34 @@ export const sessions = pgTable(
   }),
 );
 
+export const emberProfiles = pgTable(
+  "ember_profiles",
+  {
+    id: text("id").primaryKey(),
+    name: text("name").notNull(),
+    acronym: text("acronym").notNull(),
+    tone: text("tone").notNull(),
+    familyAssistantRole: text("family_assistant_role").notNull(),
+    privacyBoundaries: text("privacy_boundaries").notNull(),
+    responseStyle: text("response_style").notNull(),
+    allowedInitiative: text("allowed_initiative").notNull(),
+    forbiddenActions: text("forbidden_actions").notNull(),
+    uncertaintyBehavior: text("uncertainty_behavior").notNull(),
+    memoryBehavior: text("memory_behavior").notNull(),
+    additionalInstructions: text("additional_instructions").notNull().default(""),
+    updatedByUserId: text("updated_by_user_id").references(() => users.id, { onDelete: "set null" }),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "date" }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" }).notNull().defaultNow(),
+  },
+  (table) => ({
+    byUpdatedAt: index("ember_profiles_updated_idx").on(table.updatedAt),
+  }),
+);
+
 export const usersRelations = relations(users, ({ many }) => ({
   conversations: many(conversations),
   sessions: many(sessions),
+  updatedEmberProfiles: many(emberProfiles),
 }));
 
 export const conversationsRelations = relations(conversations, ({ one, many }) => ({
@@ -110,6 +135,14 @@ export const sessionsRelations = relations(sessions, ({ one }) => ({
   }),
 }));
 
+export const emberProfilesRelations = relations(emberProfiles, ({ one }) => ({
+  updatedByUser: one(users, {
+    fields: [emberProfiles.updatedByUserId],
+    references: [users.id],
+  }),
+}));
+
 export type UserRecord = typeof users.$inferSelect;
 export type ConversationRecord = typeof conversations.$inferSelect;
 export type MessageRecord = typeof messages.$inferSelect;
+export type EmberProfileRecord = typeof emberProfiles.$inferSelect;

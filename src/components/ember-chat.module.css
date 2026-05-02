@@ -190,6 +190,20 @@
   font-size: 0.82rem;
 }
 
+.adminLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  border: 1px solid #e2c8b2;
+  border-radius: 8px;
+  background: #fff8f0;
+  color: var(--ink);
+  font-size: 0.84rem;
+  font-weight: 700;
+  padding: 0.45rem 0.5rem;
+}
+
 .logoutButton {
   margin-top: auto;
   border: 1px solid #e2c8b2;

@@ -1,0 +1,131 @@
+.page {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 1.25rem;
+}
+
+.card {
+  width: min(920px, 100%);
+  border: 1px solid var(--surface-border);
+  border-radius: 18px;
+  background: var(--surface);
+  box-shadow: 0 22px 42px rgba(96, 67, 45, 0.12);
+  padding: 1rem;
+  display: grid;
+  gap: 0.9rem;
+}
+
+.header {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.kicker {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-soft);
+  font-weight: 700;
+}
+
+.title {
+  font-family: var(--font-heading), Georgia, serif;
+  font-size: 1.75rem;
+}
+
+.subtitle,
+.editor {
+  color: var(--ink-soft);
+}
+
+.form {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.label {
+  display: grid;
+  gap: 0.3rem;
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.input,
+.textarea {
+  width: 100%;
+  border: 1px solid var(--surface-border);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.95rem;
+  padding: 0.65rem 0.7rem;
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 72px;
+}
+
+.input:focus,
+.textarea:focus {
+  outline: 2px solid #d6a27f;
+  outline-offset: 1px;
+  border-color: var(--accent);
+}
+
+.error {
+  color: #a33b2a;
+}
+
+.notice {
+  color: #2f6a3f;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.85rem;
+}
+
+.linkButton {
+  border: 1px solid #e2c8b2;
+  border-radius: 999px;
+  padding: 0.55rem 0.95rem;
+  background: #fff8f0;
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.saveButton {
+  border: none;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  padding: 0.6rem 1.2rem;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.saveButton:disabled {
+  opacity: 0.62;
+  cursor: not-allowed;
+}
+
+@media (max-width: 640px) {
+  .actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .saveButton,
+  .linkButton {
+    text-align: center;
+  }
+}

@@ -23,9 +23,6 @@ export type OllamaRuntimeOptions = {
 export const FALLBACK_MODEL: EmberModel = MODEL_OPTIONS[0];
 export const FALLBACK_RESPONSE_MODE: EmberResponseMode = "helpful";
 
-const EMBER_BASE_IDENTITY =
-  "You are EMBER, the Enhanced Memory Backbone for Everyday Reasoning. You are Brannan's local family AI assistant running on his home server. Stay grounded in practical truth, and keep advice actionable.";
-
 const RESPONSE_MODE_PROMPTS: Record<EmberResponseMode, string> = {
   strict:
     "Mode: STRICT. Prioritize precision and restraint. Be concise, factual, and cautious about uncertain claims. Ask for clarification when necessary before making assumptions.",
@@ -100,8 +97,8 @@ export function resolveRequestedResponseMode(modeFromRequest?: string | null): E
   return FALLBACK_RESPONSE_MODE;
 }
 
-export function buildSystemInstruction(mode: EmberResponseMode) {
-  return `${EMBER_BASE_IDENTITY} ${RESPONSE_MODE_PROMPTS[mode]}`;
+export function buildSystemInstruction(mode: EmberResponseMode, emberIdentityInstruction: string) {
+  return `${emberIdentityInstruction}\n\nResponse Mode Guidance: ${RESPONSE_MODE_PROMPTS[mode]}`;
 }
 
 export function resolveRuntimeOptions(mode: EmberResponseMode): OllamaRuntimeOptions {
