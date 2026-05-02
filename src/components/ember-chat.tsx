@@ -4,19 +4,22 @@ import { FormEvent, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./ember-chat.module.css";
 import type { ConversationMessage, ConversationSummary } from "@/lib/chat-types";
-import type { EmberModel } from "@/lib/ollama";
+import type { EmberModel, EmberResponseMode } from "@/lib/ollama";
 
 type EmberChatProps = {
   userName: string;
   userRole: "admin" | "user";
   defaultModel: EmberModel;
   models: EmberModel[];
+  defaultResponseMode: EmberResponseMode;
+  responseModes: EmberResponseMode[];
   initialConversations: ConversationSummary[];
   initialConversationId: string | null;
   initialMessages: ConversationMessage[];
 };
 
 type ChatApiResponse = {
+  responseMode?: EmberResponseMode;
   conversation?: ConversationSummary;
   userMessage?: ConversationMessage;
   assistantMessage?: ConversationMessage;
@@ -52,6 +55,8 @@ export default function EmberChat({
   userRole,
   defaultModel,
   models,
+  defaultResponseMode,
+  responseModes,
   initialConversations,
   initialConversationId,
   initialMessages,
@@ -66,6 +71,8 @@ export default function EmberChat({
   >(() => (initialConversationId ? { [initialConversationId]: initialMessages } : {}));
   const [input, setInput] = useState("");
   const [selectedModel, setSelectedModel] = useState<EmberModel>(defaultModel);
+  const [selectedResponseMode, setSelectedResponseMode] =
+    useState<EmberResponseMode>(defaultResponseMode);
   const [isSending, setIsSending] = useState(false);
   const [isLoadingConversation, setIsLoadingConversation] = useState(false);
   const [isCreatingConversation, setIsCreatingConversation] = useState(false);
@@ -263,6 +270,7 @@ export default function EmberChat({
         body: JSON.stringify({
           conversationId: activeConversationId,
           model: selectedModel,
+          responseMode: selectedResponseMode,
           content,
         }),
       });
@@ -427,6 +435,21 @@ export default function EmberChat({
                 {models.map((modelName) => (
                   <option key={modelName} value={modelName}>
                     {modelName}
+                  </option>
+                ))}
+              </select>
+              <label htmlFor="response-mode">Mode</label>
+              <select
+                id="response-mode"
+                name="response-mode"
+                value={selectedResponseMode}
+                disabled={isSending}
+                onChange={(event) => setSelectedResponseMode(event.target.value as EmberResponseMode)}
+                className={styles.select}
+              >
+                {responseModes.map((mode) => (
+                  <option key={mode} value={mode}>
+                    {mode}
                   </option>
                 ))}
               </select>

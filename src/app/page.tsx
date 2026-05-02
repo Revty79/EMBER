@@ -1,7 +1,7 @@
 import EmberChat from "@/components/ember-chat";
 import { requireUserOrRedirect } from "@/lib/auth";
 import { listConversationsForUser, listMessagesForConversation } from "@/lib/conversations";
-import { MODEL_OPTIONS, resolveDefaultModel } from "@/lib/ollama";
+import { MODEL_OPTIONS, RESPONSE_MODE_OPTIONS, resolveDefaultModel } from "@/lib/ollama";
 
 export const dynamic = "force-dynamic";
 
@@ -20,6 +20,8 @@ export default async function Home() {
       userRole={user.role}
       defaultModel={defaultModel}
       models={[...MODEL_OPTIONS]}
+      defaultResponseMode="helpful"
+      responseModes={[...RESPONSE_MODE_OPTIONS]}
       initialConversations={initialConversations}
       initialConversationId={initialConversationId}
       initialMessages={initialMessages}

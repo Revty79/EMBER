@@ -6,7 +6,9 @@ import { getCurrentUser } from "@/lib/auth";
 import { buildConversationTitle } from "@/lib/conversations";
 import { createId } from "@/lib/ids";
 import {
-  EMBER_SYSTEM_INSTRUCTION,
+  buildSystemInstruction,
+  resolveRequestedResponseMode,
+  resolveRuntimeOptions,
   resolveRequestedModel,
   sendOllamaChatRequest,
 } from "@/lib/ollama";
@@ -16,6 +18,7 @@ export const runtime = "nodejs";
 type ChatRequestBody = {
   conversationId?: string;
   model?: string;
+  responseMode?: string;
   content?: string;
 };
 
@@ -41,6 +44,9 @@ export async function POST(request: Request) {
   }
 
   const model = resolveRequestedModel(body.model);
+  const responseMode = resolveRequestedResponseMode(body.responseMode);
+  const systemInstruction = buildSystemInstruction(responseMode);
+  const runtimeOptions = resolveRuntimeOptions(responseMode);
   const db = getDb();
   const now = new Date();
   let activeConversationId = body.conversationId?.trim();
@@ -128,13 +134,13 @@ export async function POST(request: Request) {
     const assistantReply = await sendOllamaChatRequest(model, [
       {
         role: "system",
-        content: EMBER_SYSTEM_INSTRUCTION,
+        content: systemInstruction,
       },
       ...storedMessages.map((message) => ({
         role: message.role,
         content: message.content,
       })),
-    ]);
+    ], runtimeOptions);
 
     const assistantMessageId = createId();
     const assistantCreatedAt = new Date();
@@ -157,6 +163,7 @@ export async function POST(request: Request) {
       .where(and(eq(conversations.id, activeConversationId), eq(conversations.userId, user.id)));
 
     return NextResponse.json({
+      responseMode,
       conversation: {
         id: activeConversationId,
         title,
