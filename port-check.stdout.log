@@ -1,0 +1,11 @@
+
+> ember@0.1.0 dev
+> next dev -p 3004
+
+▲ Next.js 16.2.4 (Turbopack)
+- Local:         http://localhost:3004
+- Network:       http://10.0.0.109:3004
+- Environments: .env.local
+✓ Ready in 449ms
+Creating turbopack project { dir: 'D:\\EMBER', testMode: true }
+
