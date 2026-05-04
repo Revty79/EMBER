@@ -1,5 +1,6 @@
 import { relations } from "drizzle-orm";
 import {
+  boolean,
   index,
   pgEnum,
   pgTable,
@@ -107,6 +108,34 @@ export const emberProfiles = pgTable(
   }),
 );
 
+export const minecraftBridgeLogs = pgTable(
+  "minecraft_bridge_logs",
+  {
+    id: text("id").primaryKey(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "date" }).notNull().defaultNow(),
+    mode: text("mode").notNull(),
+    observationTimestamp: text("observation_timestamp"),
+    botUsername: text("bot_username"),
+    observationJson: text("observation_json").notNull(),
+    observationSummary: text("observation_summary"),
+    model: text("model"),
+    responseMode: text("response_mode"),
+    promptText: text("prompt_text"),
+    shadowReply: text("shadow_reply"),
+    wouldDo: text("would_do"),
+    confidence: text("confidence"),
+    requestedActionsJson: text("requested_actions_json"),
+    executed: boolean("executed").notNull().default(false),
+    acceptedByBody: boolean("accepted_by_body"),
+    bodyResultJson: text("body_result_json"),
+    error: text("error"),
+  },
+  (table) => ({
+    byCreatedAt: index("minecraft_bridge_logs_created_idx").on(table.createdAt),
+    byModeCreatedAt: index("minecraft_bridge_logs_mode_created_idx").on(table.mode, table.createdAt),
+  }),
+);
+
 export const usersRelations = relations(users, ({ many }) => ({
   conversations: many(conversations),
   sessions: many(sessions),
@@ -146,3 +175,4 @@ export type UserRecord = typeof users.$inferSelect;
 export type ConversationRecord = typeof conversations.$inferSelect;
 export type MessageRecord = typeof messages.$inferSelect;
 export type EmberProfileRecord = typeof emberProfiles.$inferSelect;
+export type MinecraftBridgeLogRecord = typeof minecraftBridgeLogs.$inferSelect;

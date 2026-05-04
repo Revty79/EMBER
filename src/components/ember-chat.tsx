@@ -479,6 +479,9 @@ export default function EmberChat({
               <Link className={styles.adminLink} href="/admin/ember-instructions">
                 Edit EMBER Instructions
               </Link>
+              <Link className={styles.adminLink} href="/admin/minecraft">
+                Review Minecraft Bridge
+              </Link>
             </section>
           ) : null}
 

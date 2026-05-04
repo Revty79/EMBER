@@ -22,6 +22,13 @@
       "when": 1777692943172,
       "tag": "0002_bizarre_power_pack",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1777930484655,
+      "tag": "0003_narrow_hitman",
+      "breakpoints": true
     }
   ]
 }

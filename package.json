@@ -11,7 +11,8 @@
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
     "seed:admin": "tsx src/scripts/seed-admin.ts",
-    "auth:test": "tsx src/scripts/auth-test.ts"
+    "auth:test": "tsx src/scripts/auth-test.ts",
+    "minecraft:shadow:test": "tsx src/scripts/minecraft-shadow-test.ts"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

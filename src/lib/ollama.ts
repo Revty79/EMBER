@@ -127,7 +127,7 @@ function extractAssistantReply(raw: unknown): string | null {
 }
 
 export async function sendOllamaChatRequest(
-  model: EmberModel,
+  model: string,
   messages: OllamaChatMessage[],
   options?: OllamaRuntimeOptions,
 ) {

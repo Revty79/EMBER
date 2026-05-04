@@ -1,0 +1,45 @@
+{
+  "timestamp": "2026-05-04T18:00:00.000Z",
+  "bot": {
+    "username": "EmberR2025",
+    "ownerUsername": "Brannan",
+    "dimension": "overworld",
+    "x": 12,
+    "y": 65,
+    "z": -8
+  },
+  "survival": {
+    "vitals": {
+      "health": 20,
+      "maxHealth": 20,
+      "food": 20,
+      "saturation": 8,
+      "danger": "none"
+    },
+    "yard": {
+      "enabled": true,
+      "insideRadius": true,
+      "distanceFromHome": 4
+    },
+    "safetyFlags": {
+      "hostileNearby": false,
+      "takingDamage": false,
+      "outsideSafeArea": false
+    },
+    "visibleOres": ["coal_ore"],
+    "mineableOres": ["coal_ore"]
+  },
+  "actionQueue": {
+    "active": "idle",
+    "queuedCount": 0,
+    "busy": false
+  },
+  "recentEvents": [
+    {
+      "timestamp": "2026-05-04T17:59:55.000Z",
+      "type": "status",
+      "detail": "Returned to home yard.",
+      "severity": "info"
+    }
+  ]
+}
