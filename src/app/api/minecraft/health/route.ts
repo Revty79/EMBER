@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
+import { authorizeMinecraftBridgeOrAdmin } from "@/lib/minecraft/auth";
 import { getMinecraftBridgeConfig } from "@/lib/minecraft/bridge";
-import { validateBridgeToken } from "@/lib/minecraft/validation";
 
 export const runtime = "nodejs";
 
 export async function GET(request: Request) {
-  const auth = validateBridgeToken(request);
+  const auth = await authorizeMinecraftBridgeOrAdmin(request);
 
   if (!auth.ok) {
     return NextResponse.json({ error: auth.error }, { status: auth.status });

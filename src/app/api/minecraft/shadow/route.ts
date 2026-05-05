@@ -22,6 +22,38 @@ import {
 
 export const runtime = "nodejs";
 
+const SHADOW_FALLBACK_REPLY =
+  "I am safe near home. I would stay idle and wait for Brannan's next command.";
+
+function normalizeShadowReply(rawReply: string) {
+  const withoutCodeBlocks = rawReply.replace(/```[\s\S]*?```/g, " ");
+  const withoutBackticks = withoutCodeBlocks.replace(/`+/g, " ");
+  const compact = withoutBackticks.replace(/\s+/g, " ").trim();
+
+  if (!compact) {
+    return SHADOW_FALLBACK_REPLY;
+  }
+
+  const sentenceParts = compact
+    .split(/(?<=[.!?])\s+/)
+    .map((part) => part.trim())
+    .filter((part) => part.length > 0);
+
+  const trimmedToTwoSentences =
+    sentenceParts.length > 0 ? sentenceParts.slice(0, 2).join(" ") : compact;
+  const normalized = trimmedToTwoSentences.trim();
+
+  if (!normalized) {
+    return SHADOW_FALLBACK_REPLY;
+  }
+
+  if (normalized.length > 280) {
+    return `${normalized.slice(0, 277).trimEnd()}...`;
+  }
+
+  return normalized;
+}
+
 export async function POST(request: Request) {
   const auth = validateBridgeToken(request);
 
@@ -59,7 +91,7 @@ export async function POST(request: Request) {
   const systemInstruction = buildSystemInstruction(config.shadowResponseMode, bridgePrompt);
 
   try {
-    const reply = await sendOllamaChatRequest(
+    const rawReply = await sendOllamaChatRequest(
       config.shadowModel,
       [
         {
@@ -73,6 +105,7 @@ export async function POST(request: Request) {
       ],
       resolveBridgeRuntimeOptions(config.shadowResponseMode),
     );
+    const reply = normalizeShadowReply(rawReply);
 
     let logId: string | undefined;
 

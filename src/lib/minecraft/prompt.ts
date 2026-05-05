@@ -30,8 +30,11 @@ export function buildMinecraftShadowPrompt(
     "- wander yard",
     "You must not suggest combat, building, containers, crafting, cave diving, or free roaming yet.",
     "You must not claim you performed an action.",
-    "Use concise first-person language.",
-    "Make the reply useful for logging and later display.",
+    "Reply in 1-2 short sentences.",
+    "Use practical Minecraft language, not roleplay or storytelling.",
+    "Do not include code blocks, lists, or long follow-up questions.",
+    "Do not imply any action was executed.",
+    "Keep reply text useful for logging display.",
     `Observation Summary: ${observationSummary}`,
   ].join("\n");
 }

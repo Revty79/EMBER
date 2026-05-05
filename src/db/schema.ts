@@ -1,6 +1,7 @@
 import { relations } from "drizzle-orm";
 import {
   boolean,
+  integer,
   index,
   pgEnum,
   pgTable,
@@ -136,6 +137,40 @@ export const minecraftBridgeLogs = pgTable(
   }),
 );
 
+export const minecraftBridgeSettings = pgTable(
+  "minecraft_bridge_settings",
+  {
+    id: text("id").primaryKey().default("default"),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "date" }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" }).notNull().defaultNow(),
+    updatedBy: text("updated_by"),
+    shadowEnabled: boolean("shadow_enabled").notNull().default(false),
+    shadowStoreObservations: boolean("shadow_store_observations").notNull().default(true),
+    shadowChatSummary: boolean("shadow_chat_summary").notNull().default(false),
+    shadowObservationIntervalMs: integer("shadow_observation_interval_ms").notNull().default(180000),
+    shadowTimeoutMs: integer("shadow_timeout_ms").notNull().default(180000),
+    bridgeDebug: boolean("bridge_debug").notNull().default(false),
+    supervisedEnabled: boolean("supervised_enabled").notNull().default(false),
+    aiBridgeEnabled: boolean("ai_bridge_enabled").notNull().default(false),
+    taskSystemEnabled: boolean("task_system_enabled").notNull().default(true),
+    allowEating: boolean("allow_eating").notNull().default(true),
+    allowEquip: boolean("allow_equip").notNull().default(true),
+    allowFlee: boolean("allow_flee").notNull().default(true),
+    allowMining: boolean("allow_mining").notNull().default(true),
+    allowHarvest: boolean("allow_harvest").notNull().default(true),
+    allowWander: boolean("allow_wander").notNull().default(true),
+    allowCropHarvest: boolean("allow_crop_harvest").notNull().default(false),
+    allowCombat: boolean("allow_combat").notNull().default(false),
+    allowBuilding: boolean("allow_building").notNull().default(false),
+    allowCrafting: boolean("allow_crafting").notNull().default(false),
+    allowContainers: boolean("allow_containers").notNull().default(false),
+    notes: text("notes"),
+  },
+  (table) => ({
+    byUpdatedAt: index("minecraft_bridge_settings_updated_idx").on(table.updatedAt),
+  }),
+);
+
 export const usersRelations = relations(users, ({ many }) => ({
   conversations: many(conversations),
   sessions: many(sessions),
@@ -176,3 +211,4 @@ export type ConversationRecord = typeof conversations.$inferSelect;
 export type MessageRecord = typeof messages.$inferSelect;
 export type EmberProfileRecord = typeof emberProfiles.$inferSelect;
 export type MinecraftBridgeLogRecord = typeof minecraftBridgeLogs.$inferSelect;
+export type MinecraftBridgeSettingsRecord = typeof minecraftBridgeSettings.$inferSelect;
